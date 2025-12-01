@@ -37,7 +37,7 @@ public class CourseServiceImpl implements CourseService{
         User tutor = userRepository.findByEmail(tutorEmail)
                 .orElseThrow(() -> new RuntimeException("Tutor not found"));
 
-        validateTutor(tutor);
+//        validateTutor(tutor);
 
         Course course = Course.builder()
                 .title(request.getTitle())
