@@ -1,16 +1,15 @@
 name: CI
 
-on: 
+on:
   push:
   workflow_dispatch:
 
 jobs:
   build:
-     runs-on: ubuntu-latest
-     steps:
-         -name: Checkout repository
-          uses: actions/checkout@v3
-       
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
 
-         -name: Print greeting
-          run: echo "Hello from learning-platform CI!""
+      - name: Print greeting
+        run: echo "Hello from learning-platform CI!"
