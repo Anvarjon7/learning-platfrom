@@ -30,7 +30,7 @@ public abstract class Lesson {
     @JoinColumn(name = "module_id")
     private Module module;
 
-    private enum LessonType{
+    public enum LessonType{
         PDF,VIDEO,QUIZ,CODING,TEXT
     }
 }
