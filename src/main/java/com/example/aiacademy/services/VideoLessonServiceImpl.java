@@ -9,6 +9,7 @@ import com.example.aiacademy.models.VideoLesson;
 import com.example.aiacademy.repositories.ModuleRepository;
 import com.example.aiacademy.repositories.UserRepository;
 import com.example.aiacademy.repositories.VideoLessonRepository;
+import com.example.aiacademy.security.annotations.TutorOnly;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -22,19 +23,13 @@ public class VideoLessonServiceImpl implements VideoLessonService{
     private final UserRepository userRepository;
     private final FileStorageService fileStorageService;
 
-    private void validateTutor(User user){
-        boolean ok = user.getRoles().stream()
-                .anyMatch(r -> r.getName().name().equals("ROLE_TUTOR") || r.getName().name().equals("ROLE_ADMIN"));
 
-        if (!ok) throw new RuntimeException("Only tutors can create lessons");
-    }
-
+    @TutorOnly
     @Override
     public VideoLessonResponse createLesson(Long moduleId, String tutorEmail, VideoLessonRequest request) {
         User tutor = userRepository.findByEmail(tutorEmail)
                 .orElseThrow(() -> new RuntimeException("Tutor not found"));
 
-        validateTutor(tutor);
 
         Module module = moduleRepository.findById(moduleId)
                 .orElseThrow(() -> new RuntimeException("Module not found"));
@@ -51,6 +46,7 @@ public class VideoLessonServiceImpl implements VideoLessonService{
         return VideoLessonResponse.fromEntity(lesson);
     }
 
+    @TutorOnly
     @Override
     public VideoLessonResponse uploadVideo(Long lessonId, String tutorEmail, MultipartFile file) {
 

@@ -6,6 +6,8 @@ import com.example.aiacademy.models.Course;
 import com.example.aiacademy.models.User;
 import com.example.aiacademy.repositories.CourseRepository;
 import com.example.aiacademy.repositories.UserRepository;
+import com.example.aiacademy.security.annotations.AdminOnly;
+import com.example.aiacademy.security.annotations.TutorOnly;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -32,6 +34,7 @@ public class CourseServiceImpl implements CourseService{
         }
     }
 
+    @TutorOnly
     @Override
     public CourseResponse createCourse(String tutorEmail, CourseRequest request) {
         User tutor = userRepository.findByEmail(tutorEmail)
@@ -91,6 +94,7 @@ public class CourseServiceImpl implements CourseService{
         return toResponse(course);
     }
 
+    @AdminOnly
     @Override
     public void deleteCourse(Long id, String tutorEmail) {
         Course course = courseRepository.findById(id)
