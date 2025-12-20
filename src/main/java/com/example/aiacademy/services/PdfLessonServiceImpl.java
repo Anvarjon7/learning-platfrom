@@ -48,7 +48,7 @@ public class PdfLessonServiceImpl implements PdfLessonService{
 
     @TutorOnly
     @Override
-    public PdfLessonResponse upload(Long lessonId, String tutorEmail, MultipartFile file) {
+    public PdfLessonResponse uploadPdf(Long lessonId, String tutorEmail, MultipartFile file) {
 
         PdfLesson pdfLesson = pdfLessonRepository.findById(lessonId)
                 .orElseThrow(() -> new RuntimeException("Lesson not found"));

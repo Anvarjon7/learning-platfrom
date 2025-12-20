@@ -25,22 +25,12 @@ public class CourseServiceImpl implements CourseService{
         this.userRepository = userRepository;
     }
 
-    private void validateTutor(User user){
-        boolean isTutor = user.getRoles().stream()
-                .anyMatch(r -> r.getName().name().equals("ROLE_TUTOR") || r.getName().name().equals("ROLE_ADMIN"));
-
-        if (!isTutor){
-            throw new RuntimeException("Only tutors or admins can manage courses");
-        }
-    }
-
     @TutorOnly
     @Override
     public CourseResponse createCourse(String tutorEmail, CourseRequest request) {
         User tutor = userRepository.findByEmail(tutorEmail)
                 .orElseThrow(() -> new RuntimeException("Tutor not found"));
 
-//        validateTutor(tutor);
 
         Course course = Course.builder()
                 .title(request.getTitle())

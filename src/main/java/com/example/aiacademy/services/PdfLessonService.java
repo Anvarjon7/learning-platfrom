@@ -7,5 +7,5 @@ import org.springframework.web.multipart.MultipartFile;
 public interface PdfLessonService {
 
     PdfLessonResponse create(Long moduleId, String tutorEmail, PdfLessonRequest  request);
-    PdfLessonResponse upload(Long lessonId, String tutorEmail, MultipartFile file);
+    PdfLessonResponse uploadPdf(Long lessonId, String tutorEmail, MultipartFile file);
 }
