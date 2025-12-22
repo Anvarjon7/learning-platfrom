@@ -21,7 +21,7 @@ public class VideoLessonServiceImpl implements VideoLessonService{
     private final ModuleRepository moduleRepository;
     private final VideoLessonRepository videoLessonRepository;
     private final UserRepository userRepository;
-    private final FileStorageService fileStorageService;
+    private final LocalFileStorageService fileStorageService;
 
 
     @TutorOnly

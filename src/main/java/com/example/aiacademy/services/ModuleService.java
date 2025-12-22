@@ -7,5 +7,10 @@ import java.util.List;
 
 public interface ModuleService {
     ModuleResponse createModule(Long courseId, String tutorEmail, ModuleRequest request);
+
     List<ModuleResponse> getModulesByCourse(Long courseId);
+
+    ModuleResponse update(Long moduleId, String tutorEmail, ModuleRequest request);
+
+    void delete(Long moduleId, String tutorEmail);
 }

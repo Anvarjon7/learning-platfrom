@@ -21,7 +21,7 @@ public class PdfLessonServiceImpl implements PdfLessonService{
     private final ModuleRepository moduleRepository;
     private final UserRepository userRepository;
     private final PdfLessonRepository pdfLessonRepository;
-    private final FileStorageService fileStorageService;
+    private final LocalFileStorageService fileStorageService;
 
     @TutorOnly
     @Override
