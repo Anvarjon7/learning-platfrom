@@ -6,6 +6,8 @@ import com.example.aiacademy.models.Course;
 import com.example.aiacademy.models.User;
 import com.example.aiacademy.repositories.CourseRepository;
 import com.example.aiacademy.repositories.UserRepository;
+import com.example.aiacademy.security.annotations.AdminOnly;
+import com.example.aiacademy.security.annotations.TutorOnly;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -23,21 +25,18 @@ public class CourseServiceImpl implements CourseService{
         this.userRepository = userRepository;
     }
 
-    private void validateTutor(User user){
-        boolean isTutor = user.getRoles().stream()
-                .anyMatch(r -> r.getName().name().equals("ROLE_TUTOR") || r.getName().name().equals("ROLE_ADMIN"));
-
-        if (!isTutor){
-            throw new RuntimeException("Only tutors or admins can manage courses");
-        }
-    }
-
+    @TutorOnly
     @Override
     public CourseResponse createCourse(String tutorEmail, CourseRequest request) {
         User tutor = userRepository.findByEmail(tutorEmail)
-                .orElseThrow(() -> new RuntimeException("Tutor not found"));
-
-//        validateTutor(tutor);
+                .orElseGet(() -> {
+                    // MVP fallback: persist the user
+                    User newUser = new User();
+                    newUser.setEmail(tutorEmail);
+                    newUser.setPassword("TEMP"); // placeholder
+                    newUser.setFullname("TEMP");
+                    return userRepository.save(newUser);
+                });
 
         Course course = Course.builder()
                 .title(request.getTitle())
@@ -51,7 +50,7 @@ public class CourseServiceImpl implements CourseService{
 
         courseRepository.save(course);
 
-        return toResponse(course);
+        return CourseResponse.fromEntity(course);
     }
 
     @Override
@@ -59,14 +58,14 @@ public class CourseServiceImpl implements CourseService{
 
         return courseRepository.findAll()
                 .stream()
-                .map(this::toResponse)
+                .map(CourseResponse::fromEntity)
                 .toList();
     }
 
     @Override
     public CourseResponse getCourseById(Long id) {
         return courseRepository.findById(id)
-                .map(this::toResponse)
+                .map(CourseResponse::fromEntity)
                 .orElseThrow(() -> new RuntimeException("Course not found"));
 
     }
@@ -88,9 +87,10 @@ public class CourseServiceImpl implements CourseService{
 
         courseRepository.save(course);
 
-        return toResponse(course);
+        return CourseResponse.fromEntity(course);
     }
 
+    @AdminOnly
     @Override
     public void deleteCourse(Long id, String tutorEmail) {
         Course course = courseRepository.findById(id)
@@ -103,14 +103,5 @@ public class CourseServiceImpl implements CourseService{
         courseRepository.delete(course);
     }
 
-    private CourseResponse toResponse(Course course){
-        return CourseResponse.builder()
-                .id(course.getId())
-                .title(course.getTitle())
-                .description(course.getDescription())
-                .category(course.getCategory())
-                .level(course.getLevel())
-                .tutorEmail(course.getTutor().getEmail())
-                .build();
-    }
+
 }
