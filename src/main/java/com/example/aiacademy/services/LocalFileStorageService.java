@@ -16,7 +16,7 @@ import java.nio.file.StandardCopyOption;
 @RequiredArgsConstructor
 public class LocalFileStorageService implements FileStorageService {
 
-    @Value("${file.storage.location}")
+    @Value("${file.storage.location:uploads}")
     private String storageLocation;
 
 

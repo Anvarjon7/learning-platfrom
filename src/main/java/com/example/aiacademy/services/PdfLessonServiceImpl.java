@@ -28,7 +28,13 @@ public class PdfLessonServiceImpl implements PdfLessonService{
     public PdfLessonResponse create(Long moduleId, String tutorEmail, PdfLessonRequest request) {
 
         User tutor = userRepository.findByEmail(tutorEmail)
-                .orElseThrow(() -> new RuntimeException("Tutor not found"));
+                .orElseGet(() -> {
+                    User u = new User();
+                    u.setEmail(tutorEmail);
+                    u.setPassword("TEMP");   // placeholder for MVP
+                    u.setFullname("TEMP");
+                    return userRepository.save(u);
+                });
 
 
         Module module = moduleRepository.findById(moduleId)
@@ -49,6 +55,10 @@ public class PdfLessonServiceImpl implements PdfLessonService{
     @TutorOnly
     @Override
     public PdfLessonResponse uploadPdf(Long lessonId, String tutorEmail, MultipartFile file) {
+
+        System.out.println("ENTERED TO PDFSERVICE");
+
+
 
         PdfLesson pdfLesson = pdfLessonRepository.findById(lessonId)
                 .orElseThrow(() -> new RuntimeException("Lesson not found"));

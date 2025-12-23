@@ -11,65 +11,78 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
-public class UserAuthServiceImpl implements UserAuthService{
+@RequiredArgsConstructor
+public class UserAuthServiceImpl implements UserAuthService {
 
-        private final UserRepository userRepository;
-        private final RoleRepository roleRepository;
-        private final JwtService jwtService;
-        private final BCryptPasswordEncoder passwordEncoder;
-
-    public UserAuthServiceImpl(UserRepository userRepository,
-                               RoleRepository roleRepository,
-                               JwtService jwtService,
-                               BCryptPasswordEncoder passwordEncoder) {
-        this.userRepository = userRepository;
-        this.roleRepository = roleRepository;
-        this.jwtService = jwtService;
-        this.passwordEncoder = passwordEncoder;
-    }
+    private final UserRepository userRepository;
+    private final RoleRepository roleRepository;
+    private final JwtService jwtService;
+    private final BCryptPasswordEncoder passwordEncoder;
 
     @Override
     public String register(String email, String password, String fullName, Set<String> roleNames) {
 
-        if (userRepository.findByEmail(email).isPresent()){
-            throw new RuntimeException("Email already exist");  //TO-DO own exception
+        if (userRepository.findByEmail(email).isPresent()) {
+            throw new RuntimeException("Email already exists");
         }
-        Set<Role> roles = new HashSet<>();
-        if (roleNames == null || roleNames.isEmpty()){
+
+        // Default role
+        if (roleNames == null || roleNames.isEmpty()) {
             roleNames = Set.of("ROLE_STUDENT");
         }
 
-        for (String roleName : roleNames){
+        Set<Role> roles = new HashSet<>();
+
+        for (String roleName : roleNames) {
             ERole eRole;
-            try{
+            try {
                 eRole = ERole.valueOf(roleName);
-            }catch (IllegalArgumentException e){
-                throw new RuntimeException("Role not found " + roleName);
+            } catch (IllegalArgumentException ex) {
+                throw new RuntimeException("Invalid role: " + roleName);
             }
 
-            Role role = roleRepository.findByName((eRole))
-                    .orElseThrow(() -> new RuntimeException("Role not found: " + roleName)); //TO-DO custom exception
+            Role role = roleRepository.findByName(eRole)
+                    .orElseThrow(() -> new RuntimeException("Role not found: " + roleName));
+
             roles.add(role);
         }
-        User user = new User(email,passwordEncoder.encode(password), fullName,roles);
+
+        User user = new User(
+                email,
+                passwordEncoder.encode(password),
+                fullName,
+                roles
+        );
+
         userRepository.save(user);
 
-        return jwtService.generateToken(user.getEmail(), roles);
+        // ✅ IMPORTANT: convert Role entities → role names
+        Set<String> roleClaims = roles.stream()
+                .map(role -> role.getName().name()) // ROLE_TUTOR
+                .collect(Collectors.toSet());
+
+        return jwtService.generateToken(user.getEmail(), roleClaims);
     }
 
     @Override
     public String login(String email, String password) {
 
         User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("User not found")); // TO-DO exception
+                .orElseThrow(() -> new RuntimeException("User not found"));
 
-        if(!passwordEncoder.matches(password, user.getPassword())){
-            throw new RuntimeException("Invalid credentials"); // TO-DO exception
+        if (!passwordEncoder.matches(password, user.getPassword())) {
+            throw new RuntimeException("Invalid credentials");
         }
-        return jwtService.generateToken(user.getEmail(), user.getRoles());
+
+        // ✅ IMPORTANT: convert Role entities → role names
+        Set<String> roleClaims = user.getRoles().stream()
+                .map(role -> role.getName().name()) // ROLE_TUTOR
+                .collect(Collectors.toSet());
+
+        return jwtService.generateToken(user.getEmail(), roleClaims);
     }
 }

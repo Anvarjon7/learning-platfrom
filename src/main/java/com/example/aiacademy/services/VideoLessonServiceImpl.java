@@ -28,8 +28,13 @@ public class VideoLessonServiceImpl implements VideoLessonService{
     @Override
     public VideoLessonResponse createLesson(Long moduleId, String tutorEmail, VideoLessonRequest request) {
         User tutor = userRepository.findByEmail(tutorEmail)
-                .orElseThrow(() -> new RuntimeException("Tutor not found"));
-
+                .orElseGet(() -> {
+                    User u = new User();
+                    u.setEmail(tutorEmail);
+                    u.setPassword("TEMP");   // placeholder for MVP
+                    u.setFullname("TEMP");
+                    return userRepository.save(u);
+                });
 
         Module module = moduleRepository.findById(moduleId)
                 .orElseThrow(() -> new RuntimeException("Module not found"));

@@ -23,15 +23,16 @@ public class JwtService {
     }
 
     // ---------------- Generate token with roles ----------------
-    public String generateToken(String username, Set<?> roles) {
+    public String generateToken(String username, Set<String> roles)
+    {
         Claims claims = Jwts.claims();
-        claims.put("roles", roles.stream().map(Object::toString).collect(Collectors.toList()));
+        claims.put("roles", roles); // already clean strings like ROLE_TUTOR
 
         return Jwts.builder()
                 .setClaims(claims)
                 .setSubject(username)
                 .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + 1000L * 60 * 60 * 24)) // 24h expiry
+                .setExpiration(new Date(System.currentTimeMillis() + 1000L * 60 * 60 * 24))
                 .signWith(getSignInKey(), SignatureAlgorithm.HS256)
                 .compact();
     }

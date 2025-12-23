@@ -26,7 +26,13 @@ public class TextLessonServiceImpl implements TextLessonService{
     public TextLessonResponse create(Long moduleId, String tutorEmail, TextLessonRequest request) {
 
         User tutor = userRepository.findByEmail(tutorEmail)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseGet(() -> {
+                    User u = new User();
+                    u.setEmail(tutorEmail);
+                    u.setPassword("TEMP");   // placeholder for MVP
+                    u.setFullname("TEMP");
+                    return userRepository.save(u);
+                });
 
 
         Module module = moduleRepository.findById(moduleId)

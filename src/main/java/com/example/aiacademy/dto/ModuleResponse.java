@@ -20,7 +20,7 @@ public class ModuleResponse {
     public static ModuleResponse fromEntity(Module module) {
         return ModuleResponse.builder()
                 .id(module.getId())
-                .title(module.getDescription())
+                .title(module.getTitle())
                 .description(module.getDescription())
                 .build();
     }

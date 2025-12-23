@@ -3,6 +3,7 @@ package com.example.aiacademy.controllers;
 import com.example.aiacademy.dto.PdfLessonRequest;
 import com.example.aiacademy.services.PdfLessonService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -25,10 +26,19 @@ public class PdfLessonController {
         );
     }
 
-    @PostMapping("/{lessonId}/upload")
+    @PostMapping(
+            value = "/upload/{lessonId}",
+            consumes = MediaType.MULTIPART_FORM_DATA_VALUE
+    )
     public ResponseEntity<?> uploadPdf(@PathVariable Long lessonId,
                                        @RequestParam("file") MultipartFile file,
                                        Principal principal) {
+
+        if (file != null || !file.isEmpty()) {
+            System.out.println("FILE" + file.getName());
+        }else {
+            System.out.println("File is null");
+        }
         return ResponseEntity.ok(
                 pdfLessonService.uploadPdf(lessonId, principal.getName(), file)
         );

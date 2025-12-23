@@ -14,6 +14,7 @@ public class TextLessonResponse {
     private final String description;
     private final String content;
     private final String type = "TEXT";
+    private String tutorEmail;
 
     public static TextLessonResponse fromEntity(TextLesson l) {
         return TextLessonResponse.builder()

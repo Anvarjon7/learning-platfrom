@@ -3,6 +3,7 @@ package com.example.aiacademy.controllers;
 import com.example.aiacademy.dto.VideoLessonRequest;
 import com.example.aiacademy.services.VideoLessonService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -26,13 +27,20 @@ public class VideoLessonController {
         return ResponseEntity.ok(videoLessonService.createLesson(moduleId, principal.getName(), request));
     }
 
-    @PostMapping("/{lessonId}/upload")
+    @PostMapping(
+            value = "/upload/{lessonId}",
+            consumes = MediaType.MULTIPART_FORM_DATA_VALUE
+    )
     public ResponseEntity<?> uploadVideo(
             Principal principal,
             @PathVariable Long moduleId,
-            @PathVariable Long lessonId,
+//            @PathVariable Long lessonId,
             @RequestParam("file") MultipartFile file
-    ) {
-        return ResponseEntity.ok(videoLessonService.uploadVideo(lessonId, principal.getName(), file));
+    )
+    {
+        if (file != null || !file.isEmpty()){
+            System.out.println("file " + file.getName());
+        }
+        return ResponseEntity.ok(videoLessonService.uploadVideo(moduleId, principal.getName(), file));
     }
 }
