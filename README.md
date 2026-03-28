@@ -26,7 +26,7 @@ and secure, role-based access.
 
 ## 🚀 Continuous Integration & Deployment (CI/CD)
 
-We have integrated a CI/CD pipeline to improve development quality, reliability, and speed of delivery.
+I have integrated a CI/CD pipeline to improve development quality, reliability, and speed of delivery.
 
 ### 🔄 How it works
 
