@@ -31,8 +31,3 @@ build/
 
 ### VS Code ###
 .vscode/
-
-### Node / Vite ###
-node_modules/
-frontend/dist/
-dist/
